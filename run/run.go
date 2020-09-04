@@ -1,4 +1,4 @@
-package cursorfuncinfo
+package run
 
 import (
 	"context"
