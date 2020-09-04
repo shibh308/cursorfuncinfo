@@ -1,6 +1,6 @@
 package a_test
 
-import "github.com/shibh308/testinfo/cursorfuncinfo/testdata/a"
+import "github.com/shibh308/cursorfuncinfo/testdata/a"
 import "testing"
 
 func BenchmarkA(b *testing.B) {

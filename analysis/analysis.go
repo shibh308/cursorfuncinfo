@@ -189,8 +189,6 @@ func (a *Analysis) rhsCheck(rhs ast.Expr) string {
 		}
 		if kv, ok := elt.(*ast.KeyValueExpr); ok {
 			if bl, ok := kv.Key.(*ast.BasicLit); ok && bl.Kind == token.STRING {
-				p := a.fs.Position(bl.Pos())
-				fmt.Println(p.Line, p.Column, p.Offset)
 				s, err := strconv.Unquote(bl.Value)
 				if err != nil {
 					return ""
