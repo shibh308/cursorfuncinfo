@@ -26,17 +26,17 @@ type TestFuncData struct {
 
 // testにいない時に返したい値
 type MainFuncJson struct {
-	Type       string
-	TargetFunc FuncData
-	TestFunc   *TestFuncData `json:"TestFunc,omitempty"`
+	IsTest      bool         `json:"Test"`
+	TargetFunc FuncData      `json:"CursorFunc"`
+	TestFunc   *TestFuncData `json:"JumpFunc,omitempty"`
 }
 
 // testにいる時に返したい値
 type TestFuncJson struct {
-	Type        string
-	TestFunc    TestFuncData
-	TargetFunc  *FuncData `json:"TargetFunc,omitempty"`
-	SubTestName *string   `json:"SubTestName,omitempty"`
+	IsTest      bool         `json:"Test"`
+	TestFunc    TestFuncData `json:"CursorFunc"`
+	TargetFunc  *FuncData    `json:"JumpFunc,omitempty"`
+	SubtestName *string      `json:"SubtestName,omitempty"`
 }
 
 type Analysis struct {
@@ -252,7 +252,7 @@ func (a *Analysis) GetFuncData() (interface{}, error) {
 		testFuncData := TestFuncData{a.makeFuncData(pkg.Name, pkg.GoFiles[a.fileIdx], fd), pref[ty]}
 		obj := a.getFuncObj(pkg.Types, funcName)
 		if obj == nil {
-			return &TestFuncJson{"test", testFuncData, nil, a.getSubTest(fd)}, nil
+			return &TestFuncJson{true, testFuncData, nil, a.getSubTest(fd)}, nil
 		}
 		objPos := a.fs.Position(obj.Pos())
 		objFuncData := FuncData{
@@ -261,7 +261,7 @@ func (a *Analysis) GetFuncData() (interface{}, error) {
 			obj.Name(),
 			objPos.Offset,
 		}
-		fp := TestFuncJson{"test", testFuncData, &objFuncData, a.getSubTest(fd)}
+		fp := TestFuncJson{true, testFuncData, &objFuncData, a.getSubTest(fd)}
 		return fp, nil
 	} else {
 		mainFuncData := a.makeFuncData(pkg.Name, pkg.GoFiles[a.fileIdx], fd)
@@ -271,12 +271,12 @@ func (a *Analysis) GetFuncData() (interface{}, error) {
 					if strings.HasSuffix(f, "_test.go") {
 						decl := a.getTestFunc(p.Syntax[j], fd.Name.String(), pre)
 						if decl != nil {
-							return MainFuncJson{"not test", mainFuncData, &TestFuncData{a.makeFuncData(p.Name, f, decl), pre}}, nil
+							return MainFuncJson{false, mainFuncData, &TestFuncData{a.makeFuncData(p.Name, f, decl), pre}}, nil
 						}
 					}
 				}
 			}
 		}
-		return MainFuncJson{"not test", mainFuncData, nil}, nil
+		return MainFuncJson{false, mainFuncData, nil}, nil
 	}
 }
